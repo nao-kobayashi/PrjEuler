@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 fn problem1() {
     println!("{}",
         (0..1000)
@@ -104,6 +106,7 @@ fn problem6(s: i32, e: i32) {
     println!("{}", b * b - a);
 }
 
+//素数判定
 fn is_prime(n: i32) -> bool {
     if n < 2  { return false; }
     else if n == 2 { return true; }
@@ -200,7 +203,171 @@ fn problem10(max: i32) {
     println!("{}", ans);
 }
 
+fn problem11() {
+    let data = [[08,02,22,97,38,15,00,40,00,75,04,05,07,78,52,12,50,77,91,08],
+        [49,49,99,40,17,81,18,57,60,87,17,40,98,43,69,48,04,56,62,00],
+        [81,49,31,73,55,79,14,29,93,71,40,67,53,88,30,03,49,13,36,65],
+        [52,70,95,23,04,60,11,42,69,24,68,56,01,32,56,71,37,02,36,91],
+        [22,31,16,71,51,67,63,89,41,92,36,54,22,40,40,28,66,33,13,80],
+        [24,47,32,60,99,03,45,02,44,75,33,53,78,36,84,20,35,17,12,50],
+        [32,98,81,28,64,23,67,10,26,38,40,67,59,54,70,66,18,38,64,70],
+        [67,26,20,68,02,62,12,20,95,63,94,39,63,08,40,91,66,49,94,21],
+        [24,55,58,05,66,73,99,26,97,17,78,78,96,83,14,88,34,89,63,72],
+        [21,36,23,09,75,00,76,44,20,45,35,14,00,61,33,97,34,31,33,95],
+        [78,17,53,28,22,75,31,67,15,94,03,80,04,62,16,14,09,53,56,92],
+        [16,39,05,42,96,35,31,47,55,58,88,24,00,17,54,24,36,29,85,57],
+        [86,56,00,48,35,71,89,07,05,44,44,37,44,60,21,58,51,54,17,58],
+        [19,80,81,68,05,94,47,69,28,73,92,13,86,52,17,77,04,89,55,40],
+        [04,52,08,83,97,35,99,16,07,97,57,32,16,26,26,79,33,27,98,66],
+        [88,36,68,87,57,62,20,72,03,46,33,67,46,55,12,32,63,93,53,69],
+        [04,42,16,73,38,25,39,11,24,94,72,18,08,46,29,32,40,62,76,36],
+        [20,69,36,41,72,30,23,88,34,62,99,69,82,67,59,85,74,04,36,16],
+        [20,73,35,29,78,31,90,01,74,31,49,71,48,86,81,16,23,57,05,54],
+        [01,70,54,71,83,51,54,69,16,92,33,48,61,43,52,01,89,19,67,48]
+    ];
+
+    let mut values = Vec::new();
+    for x in 0..20 {
+        for y in 0..20 {
+            if x < 17 as usize {
+                let h1 = data[y][x];
+                let h2 = data[y][x + 1];
+                let h3 = data[y][x + 2];
+                let h4 = data[y][x + 3];
+                values.push(h1 * h2 * h3 * h4);
+            }
+
+            if x < 17 as usize && y < 17 as usize {
+                let c_r1 = data[y][x];
+                let c_r2 = data[y + 1][x + 1];
+                let c_r3 = data[y + 2][x + 2];
+                let c_r4 = data[y + 3][x + 3];
+                values.push(c_r1 * c_r2 * c_r3 * c_r4);
+            }
+
+            if y < 17 as usize {
+                let v1 = data[x][y];
+                let v2 = data[x][y + 1];
+                let v3 = data[x][y + 2];
+                let v4 = data[x][y + 3];
+                values.push(v1 * v2 * v3 * v4);
+            }
+
+            if x > 2 as usize && y < 17 as usize {
+                let c_l1 = data[y][x];
+                let c_l2 = data[y + 1][x - 1];
+                let c_l3 = data[y + 2][x - 2];
+                let c_l4 = data[y + 3][x - 3];
+                values.push(c_l1 * c_l2 * c_l3 * c_l4);
+            }
+        }
+    }
+
+    println!("{}", values.iter().map(|n| n).max().unwrap());
+}
+
+//素因数分解
+fn factoring(n: f64) -> Vec<(i64, i32)> {
+    if n == 1.0 {
+        return vec![(1, 1)];
+    }
+
+    let s = n.sqrt() as usize;
+    let mut y = n as i64;
+    let mut r = 0;
+
+    let mut result = Vec::new();
+
+    for x in 2..s + 1 {
+        if y % (x as i64) == 0 {
+            r = 0;
+            while y % (x as i64) == 0 {
+                r += 1;
+                y = y / x as i64;
+            }
+            result.push((x as i64, r));
+        }
+    }
+
+    if y as usize > s  {
+        result.push((y as i64, 1));
+    }
+
+    result
+}
+
+//fn divisors(n: i32) -> Vec<i32> {
+//    (1..n + 1)
+//        .filter_map(|d|{
+//            if n % d == 0 {
+//                Some(d)
+//            } else {
+//                None
+//            }
+//        })
+//        .collect::<Vec<i32>>()
+//}
+
+fn problem12(target: i32) {
+    let ans = (1..std::i32::MAX)
+        .find_map(|n| {
+            let tr: i32 = (1..n + 1).map(|t| t).sum();
+
+            //素因数分解した結果の指数部それぞれに1足して全部掛け合わせると約数の数になる
+            let ans = factoring(tr as f64)
+                .iter()
+                .fold(1, |calc, (num, r)| calc * (r + 1));
+
+            if ans > target {
+                Some(tr)
+            } else {
+                None
+            }
+        });
+
+    println!("{:?}", ans.unwrap_or(-1));
+}
+
+extern crate fnv;
+use fnv::FnvHashMap;
+fn problem14() {
+    let mut ans = 0;
+    let mut max_num = 0;
+    let mut cache = FnvHashMap::default();
+
+    for i in 2..1000000 {
+        let mut ret: i64 = i;
+        let mut count: i64 = 1;
+
+        while ret != 1 {
+            ret = if ret % 2 == 0 {
+                ret / 2
+            } else {
+                ret * 3 + 1
+            };
+
+            if cache.contains_key(&ret) {
+//                println!("cache hit loop in {} at {}", i, ret);
+                count += cache[&ret];
+                break;
+            }
+            count += 1;
+        }
+
+        max_num = max(max_num, count);
+        if count == max_num {
+            ans = i;
+        }
+
+        //println!("{} {}", i, count);
+        cache.insert(i, count);
+    }
+
+    println!("answer:{}", ans);
+}
+
 fn main() {
+    let start = Instant::now();
     //problem1();
     //problem2(1, 2, 0);
     //problem3(600851475143.0);
@@ -214,5 +381,13 @@ fn main() {
     //problem7(10001);
     //problem8(13);
     //problem9(1000);
-    problem10(2000000);
+    //problem10(2000000);
+    //problem11();
+    //problem12(500);
+    problem14();
+
+
+    let elapsed = start.elapsed();
+    println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
+
 }
