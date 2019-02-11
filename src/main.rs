@@ -523,6 +523,11 @@ fn problem16() {
 
 }
 
+#[macro_use]
+extern crate lazy_static;
+pub mod problem17;
+use problem17::solve;
+
 fn main() {
     let start = Instant::now();
     //problem1();
@@ -544,7 +549,9 @@ fn main() {
     //problem13();
     //problem14();
     //problem15(20);
-    problem16();
+    //problem16();
+
+    problem17::solve();
 
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);

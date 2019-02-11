@@ -7,3 +7,4 @@ edition = "2018"
 [dependencies]
 fnv = "1.0.6"
 num-bigint = "0.2.2"
+lazy_static = "1.2.0"
