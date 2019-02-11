@@ -602,6 +602,17 @@ fn problem19() {
     println!("{}", count);
 }
 
+fn problem20() {
+    let a = BigInt::parse_bytes("1".as_bytes(), 10).unwrap();
+    let ans = (1..101)
+        .fold(a, |x, y| x * BigInt::parse_bytes(&y.to_string().as_bytes(), 10).unwrap());
+    let num = ans.to_string().chars().map(|c| c.to_digit(10).unwrap()).sum::<u32>();
+
+
+    println!("{}", ans.to_string());
+    println!("{}", num);
+}
+
 fn main() {
     let start = Instant::now();
     //problem1();
@@ -627,7 +638,8 @@ fn main() {
 
     //problem17::solve();
 //    problem18();
-    problem19();
+    //problem19();
+    problem20();
 
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
