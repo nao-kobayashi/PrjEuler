@@ -567,6 +567,41 @@ fn problem18() {
 
 }
 
+fn problem19() {
+    let mut count = 0;
+    let mut day_of_week = 2;
+    let months = [31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    for y in 1901..2001 {
+        for (i, m) in months.iter().enumerate() {
+            let days = if i == 1 {
+                if y % 4 == 0 && y % 100 != 0 || y % 400 == 0 {
+                    29
+                } else {
+                    28
+                }
+            } else {
+                *m
+            };
+
+            //calc first day of next month.
+            day_of_week += days % 7;
+            if day_of_week >= 7 {
+                day_of_week -= 7;
+            }
+            println!("{} {} {}", y, i + 2, day_of_week);
+
+            //for last loop calc day of week at 2001.01
+            if day_of_week == 0 {
+                if !(y == 2000 && i == 11) {
+                    count += 1;
+                }
+            }
+        }
+    }
+
+    println!("{}", count);
+}
+
 fn main() {
     let start = Instant::now();
     //problem1();
@@ -591,7 +626,8 @@ fn main() {
     //problem16();
 
     //problem17::solve();
-    problem18();
+//    problem18();
+    problem19();
 
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
