@@ -296,18 +296,6 @@ fn factoring(n: f64) -> Vec<(i64, i32)> {
     result
 }
 
-//fn divisors(n: i32) -> Vec<i32> {
-//    (1..n + 1)
-//        .filter_map(|d|{
-//            if n % d == 0 {
-//                Some(d)
-//            } else {
-//                None
-//            }
-//        })
-//        .collect::<Vec<i32>>()
-//}
-
 fn problem12(target: i32) {
     let ans = (1..std::i32::MAX)
         .find_map(|n| {
@@ -329,7 +317,7 @@ fn problem12(target: i32) {
 }
 
 extern crate fnv;
-use fnv::FnvHashMap;
+use fnv::{ FnvHashMap, FnvHashSet };
 fn problem14() {
     let mut ans = 0;
     let mut max_num = 0;
@@ -526,7 +514,7 @@ fn problem16() {
 #[macro_use]
 extern crate lazy_static;
 pub mod problem17;
-use problem17::solve;
+use crate::problem17::solve;
 
 fn problem18() {
     let data = vec![vec![75],
@@ -613,34 +601,198 @@ fn problem20() {
     println!("{}", num);
 }
 
+fn divisors(n: i32) -> Vec<i32> {
+    (1..n + 1)
+        .filter_map(|d|{
+            if n % d == 0 {
+                Some(d)
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<i32>>()
+}
+
+fn problem21() {
+    let mut hash = FnvHashMap::default();
+
+    for i in 1..100000 {
+        let mut devisor = divisors(i);
+        devisor.pop().unwrap();
+        //println!("{}:{:?}", i, devisor);
+        hash.insert(i, devisor.iter().map(|n| *n).sum::<i32>());
+    }
+
+    //println!("{:?}", hash[&2]);
+    let ans = (1..100000)
+        .map(|n|{
+            if hash.contains_key(&n) && hash.contains_key(&hash[&n]) && &hash[&n] != &n && hash[&hash[&n]] == n {
+                //println!("{} {}", n, hash[&hash[&n]]);
+                n + hash[&hash[&n]]
+            }
+            else {
+                0
+            }
+        })
+        .collect::<Vec<i32>>();
+
+    println!("{}", ans.iter().map(|n| * n).sum::<i32>() / 2);
+}
+
+//約数の合計を返す。
+//220 => 素因数分解 2^2, 5, 11
+//(1 + 2 + 2^2) * (1 + 5) * (1 + 11)
+//= 504 = 504 - 220 = 284
+//504が本来の約数の合計、284は自分自身を引いた約数の合計
+fn divisors_sum(n: i32, minus: i32) -> i32 {
+    let a = factoring(n as f64).iter()
+        .map(|(f, r)|{
+            (1..r + 1)
+                .map(|i| (*f as f64).powi(i) as i64)
+                .sum::<i64>() + 1
+        })
+        .collect::<Vec<i64>>();
+
+    //println!("{:?}", a);
+    let b = a.iter().fold(1_i64, |x, y | x * y);
+    //minus own.
+    b as i32 - minus
+}
+
+fn problem21a() {
+    let mut ans = 0;
+    let mut hash = FnvHashSet::default();
+
+    for i in 1..100000 {
+        if hash.contains(&i) { continue; }
+
+        let mut devisor = divisors(i);
+        devisor.pop().unwrap();
+        if devisor.len() == 0 { continue; }
+        let devisor_sum =  devisor.iter().map(|n| *n).sum::<i32>();
+        if i == devisor_sum  { continue; }
+
+
+        let mut devisor2 = divisors(devisor_sum);
+        devisor2.pop().unwrap();
+        if devisor2.len() == 0 { continue; }
+        let devisor_sum2 =  devisor2.iter().map(|n| *n).sum::<i32>();
+        if devisor_sum2 == i  {
+            //println!("{} {} {}", i, devisor_sum2, devisor_sum);
+            ans += i + devisor_sum;
+            hash.insert(i);
+            hash.insert(devisor_sum);
+        }
+    }
+
+    println!("{}", ans);
+}
+
+fn problem21b() {
+    let mut hash = FnvHashSet::default();
+
+    for i in 1..100000 {
+        let devisor_sum =  divisors_sum(i, i);
+        //println!("{} {} ", i, i_devisor_sum);
+        if i == devisor_sum  { continue; }
+
+        let devisor_sum2 =  divisors_sum(devisor_sum, devisor_sum);
+        if devisor_sum2 == i  {
+            if hash.contains(&i) || hash.contains(&devisor_sum) { continue; }
+            //println!("{} {} {}", i, devisor_sum2, i_devisor_sum);
+            hash.insert(i);
+            hash.insert(devisor_sum);
+        }
+    }
+
+    println!("{}", hash.iter().map(|n| *n).sum::<i32>());
+}
+
+use std::io::{ BufRead, Read, BufReader };
+use std::fs::File;
+
+const BUF_SIZE: usize = 2048;
+
+fn problem22() {
+    let mut points = FnvHashMap::default();
+    points.insert("A".to_string(), 1);
+    points.insert("B".to_string(), 2);
+    points.insert("C".to_string(), 3);
+    points.insert("D".to_string(), 4);
+    points.insert("E".to_string(), 5);
+    points.insert("F".to_string(), 6);
+    points.insert("G".to_string(), 7);
+    points.insert("H".to_string(), 8);
+    points.insert("I".to_string(), 9);
+    points.insert("J".to_string(), 10);
+    points.insert("K".to_string(), 11);
+    points.insert("L".to_string(), 12);
+    points.insert("M".to_string(), 13);
+    points.insert("N".to_string(), 14);
+    points.insert("O".to_string(), 15);
+    points.insert("P".to_string(), 16);
+    points.insert("Q".to_string(), 17);
+    points.insert("R".to_string(), 18);
+    points.insert("S".to_string(), 19);
+    points.insert("T".to_string(), 20);
+    points.insert("U".to_string(), 21);
+    points.insert("V".to_string(), 22);
+    points.insert("W".to_string(), 23);
+    points.insert("X".to_string(), 24);
+    points.insert("Y".to_string(), 25);
+    points.insert("Z".to_string(), 26);
+
+    let text_contents = std::fs::read_to_string("./names.txt").unwrap();
+    let replace_string = text_contents.replace("\"", "");
+    let mut names = replace_string.split(",").map(|s| s.to_string()).collect::<Vec<String>>();
+    names.sort();
+
+    let mut sum = 0;
+    for (i, s) in names.iter().enumerate() {
+        sum += s.chars()
+            .map(|c| points[&c.to_string()])
+            .sum::<i32>() * ((i as i32) + 1);
+    }
+
+    println!("{:?}", sum);
+}
+
 fn main() {
     let start = Instant::now();
-    //problem1();
-    //problem2(1, 2, 0);
-    //problem3(600851475143.0);
+//    problem1();
+//    problem2(1, 2, 0);
+//    problem3(600851475143.0);
 //    println!("{}", is_palindrome("abcd"));
 //    println!("{}", is_palindrome("abba"));
-    //problem4();
-    //problem5(1, 2, 11);
-    //problem6(1, 100);
-
+//    problem4();
+//    problem5(1, 2, 11);
+//    problem6(1, 100);
+//
 //    println!("{}", is_prime(19));
-    //problem7(10001);
-    //problem8(13);
-    //problem9(1000);
-    //problem10(2000000);
-    //problem11();
-    //problem12(500);
-    //problem13();
-    //problem14();
-    //problem15(20);
-    //problem16();
-
-    //problem17::solve();
+//    problem7(10001);
+//    problem8(13);
+//    problem9(1000);
+//    problem10(2000000);
+//    problem11();
+//    problem12(500);
+//    problem13();
+//    problem14();
+//    problem15(20);
+//    problem16();
+//
+//    problem17::solve();
 //    problem18();
-    //problem19();
-    problem20();
-
+//    problem19();
+//    problem20();
+//
+//    println!("{:?}", divisors(220));
+//    println!("{:?}", factoring(25.0));
+//    println!("{:?}", divisors_sum(25));
+//
+//    problem21();
+//    problem21a();
+    //problem21b();
+    problem22();
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
 
