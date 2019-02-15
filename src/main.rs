@@ -355,7 +355,7 @@ fn problem14() {
 }
 
 extern crate num_bigint;
-use num_bigint::BigInt;
+use num_bigint:: BigInt;
 fn problem13() {
     let data = ["37107287533902102798797998220837590246510135740250",
         "46376937677490009712648124896970078050417018260538",
@@ -757,6 +757,150 @@ fn problem22() {
     println!("{:?}", sum);
 }
 
+fn problem23() {
+    let v = (1..28124)
+        .filter_map(|n|
+            if divisors_sum(n, n) > n {
+                Some(n)
+            } else {
+                None
+            }
+        )
+        .collect::<Vec<i32>>();
+
+    let mut hash = FnvHashSet::default();
+    v.iter()
+        .for_each(|a| {
+            v.iter()
+                .for_each(|b| {
+                    hash.insert(a + b);
+                })
+        });
+
+    let ans = (1..28124)
+        .filter_map(|n| {
+            if !hash.contains(&n) {
+                Some(n)
+            } else {
+                None
+            }
+        })
+        .sum::<i32>();
+
+    println!("{}", ans);
+}
+
+fn problem24(mut num: i32) {
+    let mut ans = String::new();
+    let mut v = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let mut m = num;
+
+    let max = (1..11).fold(1, |a, b| a * b);
+    if max < num { return; }
+
+    while v.len() > 0 {
+        let len = v.len() as i32;
+        let combi = (1..len).fold(1, |a, b| a * b);
+
+        if m == 0 {
+            ans += &v.pop().unwrap().to_string();
+            break;
+        }
+
+        let d = m / combi;
+        m = m % combi;
+        if m != 0 {
+            ans += &v.get(d as usize).unwrap().to_string();
+            v.remove(d as usize);
+        } else {
+            ans += &v.get((d - 1) as usize).unwrap().to_string();
+            v.remove((d - 1) as usize);
+        }
+    }
+
+    println!("{}", ans + &v.get(0).unwrap().to_string());
+}
+
+fn fibonacci(max_len: usize) {
+    let a = BigInt::from(1);
+    let mut b = BigInt::from(1);
+    let mut c = BigInt::from(2);
+    let mut count = 3;
+
+    loop {
+        if c.to_string().len() >= max_len {
+            println!("No.{} {:?}", count, c);
+            break;
+        }else {
+            let d = c.clone();
+            c = b + c;
+            b = d;
+            count += 1;
+        }
+    }
+}
+
+fn problem25() {
+    fibonacci(1000);
+}
+
+fn problem26(num: i32) {
+    let mut ans = 0;
+    let primes = (1..num).filter(|n| n != &2 && n != &5 && is_prime(*n)).collect::<Vec<i32>>();
+
+    for p in primes {
+        let mut i = 1;
+        let mut remainder = 10;
+        let mut remainder_list = Vec::new();
+
+        loop {
+            remainder = remainder % p;
+            if remainder_list.iter().any(|n| n == &remainder) {
+                break;
+            }
+
+            remainder_list.push(remainder);
+            i += 1;
+            remainder = remainder * 10;
+        }
+
+        let len = i - (remainder_list[remainder_list.iter().position(|n| n == &remainder).unwrap()] + 1);
+        if ans < len {
+            println!("{} {:?}", p, remainder_list);
+            ans = p;
+        }
+    }
+
+    println!("{}", ans);
+}
+
+fn problem27() {
+    let mut max_comb = (0,0);
+    let mut max_count = 0;
+
+    for a in -999..1000 {
+        for b in -999..1000 {
+            if is_prime(b) && is_prime(1 + a + b) {
+                let mut n = 0;
+                let mut count = 0;
+                loop {
+                    if is_prime((n * n) + (a * n) + b) {
+                        count += 1;
+                    } else {
+                        if max_count < count {
+                            max_count = count;
+                            max_comb = (a, b);
+                        }
+                        break;
+                    }
+                    n += 1;
+                }
+            }
+        }
+    }
+    println!("a, b:{:?} = {}.  max_count:{}", max_comb, max_comb.0 * max_comb.1 ,max_count);
+}
+
 fn main() {
     let start = Instant::now();
 //    problem1();
@@ -792,7 +936,13 @@ fn main() {
 //    problem21();
 //    problem21a();
     //problem21b();
-    problem22();
+    //problem22();
+    //problem23();
+    //problem24(1000000);
+    //problem25();
+    //problem26(1000);
+    problem27();
+
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
 
