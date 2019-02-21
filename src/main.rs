@@ -710,6 +710,7 @@ fn problem21b() {
 
 use std::io::{ BufRead, Read, BufReader };
 use std::fs::File;
+use std::collections::HashSet;
 
 const BUF_SIZE: usize = 2048;
 
@@ -901,6 +902,85 @@ fn problem27() {
     println!("a, b:{:?} = {}.  max_count:{}", max_comb, max_comb.0 * max_comb.1 ,max_count);
 }
 
+fn problem28() {
+    let mut base: u64 = 3;
+    let mut c1: u64 = 0;
+    let mut c2: u64 = 0;
+    let mut c3: u64 = 0;
+    let mut c4: u64 = 0;
+    let mut ans: u64 = 0;
+    let limit: u64 = 1001 * 1001;
+
+    loop {
+        c1 = base * base;
+        c2 = c1 - base + 1;
+        c3 = c2 - base + 1;
+        c4 = c3 - base + 1;
+        ans += c1 + c2 + c3 + c4;
+
+        base += 2;
+        if c1 == limit { break; }
+    }
+
+    println!("ans {}", ans + 1);
+
+}
+
+use std::ops::Mul;
+
+fn problem29() {
+    let mut hash = HashSet::new();
+
+    let a = (2..101)
+        .map(|n| n)
+        .collect::<Vec<i32>>();
+
+    let b = (2..101)
+        .map(|n| n)
+        .collect::<Vec<i32>>();
+
+    for na in a.iter() {
+        for nb in b.iter() {
+            let mut tmp = BigInt::from(*na);
+            for i in 1..*nb {
+                tmp = tmp.mul(na);
+            }
+            hash.insert(tmp);
+        }
+    }
+
+    println!("{}", hash.len());
+}
+
+fn problem30_test() {
+    for i in 1..10 {
+        let a = (10.0 as f64).powi(i - 1);
+        let b = (9.0 as f64).powi(5) * i as f64;
+
+        println!("a:{} b:{} i:{} a <= b:{}", a, b, i, a<=b);
+    }
+}
+
+fn problem30() {
+    let mut ans = 0;
+    //problem30_test()より6桁内に最大値があることが分かる。
+    //7桁になると5乗では到達しない。
+    //9^6 + 1 = 354295
+    for n in 2..354295 {
+        let sum = n.to_string()
+            .chars()
+            .map(|n| f64::from(n.to_digit(10).unwrap()).powi(5) as i32)
+            .sum::<i32>();
+
+        if n == sum {
+            println!("found number is {}.", sum);
+            ans += n;
+        }
+    }
+
+    println!("ans:{}", ans);
+}
+
 fn main() {
     let start = Instant::now();
 //    problem1();
@@ -941,7 +1021,11 @@ fn main() {
     //problem24(1000000);
     //problem25();
     //problem26(1000);
-    problem27();
+    //problem27();
+    //problem28();
+    //problem29();
+    problem30_test();
+    problem30();
 
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
