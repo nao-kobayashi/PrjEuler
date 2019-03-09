@@ -1,5 +1,6 @@
-use std::time::Instant;
+#[allow(dead_code)]
 
+use std::time::Instant;
 fn problem1() {
     println!("{}",
         (0..1000)
@@ -514,7 +515,7 @@ fn problem16() {
 #[macro_use]
 extern crate lazy_static;
 pub mod problem17;
-use crate::problem17::solve;
+use crate::problem17::*;
 
 fn problem18() {
     let data = vec![vec![75],
@@ -708,8 +709,6 @@ fn problem21b() {
     println!("{}", hash.iter().map(|n| *n).sum::<i32>());
 }
 
-use std::io::{ BufRead, Read, BufReader };
-use std::fs::File;
 use std::collections::HashSet;
 
 const BUF_SIZE: usize = 2048;
@@ -983,47 +982,47 @@ fn problem30() {
 
 fn main() {
     let start = Instant::now();
-//    problem1();
-//    problem2(1, 2, 0);
-//    problem3(600851475143.0);
-//    println!("{}", is_palindrome("abcd"));
-//    println!("{}", is_palindrome("abba"));
-//    problem4();
-//    problem5(1, 2, 11);
-//    problem6(1, 100);
-//
-//    println!("{}", is_prime(19));
-//    problem7(10001);
-//    problem8(13);
-//    problem9(1000);
-//    problem10(2000000);
-//    problem11();
-//    problem12(500);
-//    problem13();
-//    problem14();
-//    problem15(20);
-//    problem16();
-//
-//    problem17::solve();
-//    problem18();
-//    problem19();
-//    problem20();
-//
-//    println!("{:?}", divisors(220));
-//    println!("{:?}", factoring(25.0));
-//    println!("{:?}", divisors_sum(25));
-//
-//    problem21();
-//    problem21a();
-    //problem21b();
-    //problem22();
-    //problem23();
-    //problem24(1000000);
-    //problem25();
-    //problem26(1000);
-    //problem27();
-    //problem28();
-    //problem29();
+    problem1();
+    problem2(1, 2, 0);
+    problem3(600851475143.0);
+    println!("{}", is_palindrome("abcd"));
+    println!("{}", is_palindrome("abba"));
+    problem4();
+    problem5(1, 2, 11);
+    problem6(1, 100);
+
+    println!("{}", is_prime(19));
+    problem7(10001);
+    problem8(13);
+    problem9(1000);
+    problem10(2000000);
+    problem11();
+    problem12(500);
+    problem13();
+    problem14();
+    problem15(20);
+    problem16();
+
+    problem17::solve();
+    problem18();
+    problem19();
+    problem20();
+
+    println!("{:?}", divisors(220));
+    println!("{:?}", factoring(25.0));
+    println!("{:?}", divisors_sum(25, 25));
+
+    problem21();
+    problem21a();
+    problem21b();
+    problem22();
+    problem23();
+    problem24(1000000);
+    problem25();
+    problem26(1000);
+    problem27();
+    problem28();
+    problem29();
     problem30_test();
     problem30();
 

@@ -1,5 +1,4 @@
 
-
 lazy_static! {
     // proper nouns
     static ref proper:[usize; 20] = [
