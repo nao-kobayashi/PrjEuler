@@ -429,15 +429,41 @@ fn is_palindrome(s: &str) -> bool {
     s == s.chars().rev().collect::<String>()
 }
 
+fn problem42() {
+    let text_contents = std::fs::read_to_string("./words.txt").unwrap();
+    let replace_string = text_contents.replace("\"", "").replace("\n", "");
+    let mut names = replace_string.split(",").map(|s| s.to_string().to_uppercase()).collect::<Vec<String>>();
+    names.sort();
+
+    let triangle_nums = (1..100)
+        .map(|n| n * (n + 1) / 2)
+        .collect::<HashSet<i32>>();
+
+    let mut nums = Vec::new();
+    for word in names.iter() {
+        let num = word.chars()
+            .map(|c| c as i32 - 64)
+            .sum::<i32>();
+
+        nums.push(num);
+    }
+
+    let cnt = nums.iter()
+        .filter(|n| triangle_nums.contains(&n) )
+        .count();
+    
+    println!("{}", cnt);
+}
+
 #[allow(dead_code)]
 fn main() {
     let start = Instant::now();
 
-    let mut coins = vec![1, 2, 5, 10, 20, 50, 100, 200];
-    coins.sort_by_key(|n| -1 * n);
-    let mut count = 0;
-    problem31(&coins, 0, 0, &mut count);
-    println!("count:{}", count);
+    // let mut coins = vec![1, 2, 5, 10, 20, 50, 100, 200];
+    // coins.sort_by_key(|n| -1 * n);
+    // let mut count = 0;
+    // problem31(&coins, 0, 0, &mut count);
+    // println!("count:{}", count);
 
     // problem32();
     // problem33();
@@ -449,12 +475,17 @@ fn main() {
     // problem38();
     // problem39();
     // problem40();
-    problem41();
+    // problem41();
 
+    // println!("{}", 'S' as i32 - 64);
+    // println!("{}", 'K' as i32 - 64);
+    // println!("{}", 'Y' as i32 - 64);
 
-    /*for i in 100000000..1000000000 {
-        println!("{}", is_prime(i));
-    }*/
+    // println!("{}", 'a' as i32);
+    // println!("{}", 's' as i32 - 64);
+    // println!("{}", 'k' as i32 - 64);
+    // println!("{}", 'y' as i32 - 64);
+    problem42();
 
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
