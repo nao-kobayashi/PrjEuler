@@ -1,6 +1,7 @@
 use std::time::Instant;
 use std::collections::HashSet;
 use std::collections::HashMap;
+use std::cmp::max;
 
 fn problem31(coins: &[i32], index: usize, sum: i32, count: &mut i32) {
     let n = coins[index];
@@ -373,6 +374,39 @@ fn problem40() {
 
 }
 
+//Note: Nine numbers cannot be done (1+2+3+4+5+6+7+8+9=45 => always dividable by 3)
+// Note: Eight numbers cannot be done (1+2+3+4+5+6+7+8=36 => always dividable by 3)
+fn problem41() {
+    let num = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    let mut i = 1;
+    let mut n_max = 0;
+    for i in 10..10000000 {
+        let num_cnt = i.to_string().len();
+        let mut keta = num[0..num_cnt].iter()
+            .map(|n| *n)
+            .collect::<HashSet<i32>>();
+
+        for c in i.to_string().chars() {
+            let n = c.to_digit(10).unwrap() as i32;
+            if keta.contains(&n) {
+                keta.remove(&n);
+            } else {
+                break;
+            }
+        }
+        if keta.len() == 0 {
+            let maybe = i;
+            if is_prime(maybe) {
+                //println!("{} is prime.", maybe);
+                n_max = max(maybe, n_max);
+            }
+        }
+    }
+
+    println!("problem41 is {}.", n_max);
+}
+
 //素数判定
 fn is_prime(n: i32) -> bool {
     if n < 2  { return false; }
@@ -395,7 +429,7 @@ fn is_palindrome(s: &str) -> bool {
     s == s.chars().rev().collect::<String>()
 }
 
-
+#[allow(dead_code)]
 fn main() {
     let start = Instant::now();
 
@@ -405,16 +439,22 @@ fn main() {
     problem31(&coins, 0, 0, &mut count);
     println!("count:{}", count);
 
-    problem32();
-    problem33();
-    problem34();
-    problem35();
-    problem36();
-    problem37();
-    problem38();
-    problem38();
-    problem39();
-    problem40();
+    // problem32();
+    // problem33();
+    // problem34();
+    // problem35();
+    // problem36();
+    // problem37();
+    // problem38();
+    // problem38();
+    // problem39();
+    // problem40();
+    problem41();
+
+
+    /*for i in 100000000..1000000000 {
+        println!("{}", is_prime(i));
+    }*/
 
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
