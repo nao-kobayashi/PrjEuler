@@ -1,7 +1,8 @@
 use std::time::Instant;
 use std::collections::HashSet;
 use std::collections::HashMap;
-use std::cmp::max;
+use std::cmp::{ max, min };
+use std::thread::spawn;
 
 fn problem31(coins: &[i32], index: usize, sum: i32, count: &mut i32) {
     let n = coins[index];
@@ -455,6 +456,182 @@ fn problem42() {
     println!("{}", cnt);
 }
 
+//これ長時間かかる 注意
+fn problem43() {
+    let mut sum = 0;
+    for i in 1000000000..10000000000_i64 {
+        let s = i.to_string();
+        if &s[1..4].parse::<i32>().unwrap() % 2 == 0
+            && &s[2..5].parse::<i32>().unwrap() % 3 == 0
+            && &s[3..6].parse::<i32>().unwrap() % 5 == 0
+            && &s[4..7].parse::<i32>().unwrap() % 7 == 0
+            && &s[5..8].parse::<i32>().unwrap() % 11 == 0
+            && &s[6..9].parse::<i32>().unwrap() % 13 == 0
+            && &s[7..10].parse::<i32>().unwrap() % 17 == 0 {
+
+            //println!("target: {:?}", i);
+            let mut keta = s.chars().map(|c| c.to_digit(10).unwrap()).collect::<Vec<u32>>();
+            keta.sort();
+            keta.dedup();
+
+            if keta.len() == 10 {
+                sum += i;
+                println!("found: {:?}", i);
+            }
+        }
+    }
+    println!("answer:{:?}", sum);
+}
+
+fn problem44() {
+    let pentagon = (1..3001).map(|n| (n * (3 * n - 1)) /2 ).collect::<Vec<i32>>();
+    let hash = pentagon.iter().map(|n| *n).collect::<HashSet<i32>>();
+
+    let mut min_n: i32 = 999999999;
+    let mut index = pentagon.len() - 1;
+    while index >= 0 {
+        let num1 = pentagon[index];
+        let mut index2 = pentagon.len() - 1;
+        while index2 >= 0 {
+            let num2 = pentagon[index2];
+            if hash.contains(&(num2 - num1)) && hash.contains(&(num2 + num1)) {
+                min_n = min(min_n, num2 - num1);
+            }
+            if index2 == 0 { break; }
+            index2 -= 1;
+        }
+
+        if index == 0 { break; }
+        index -= 1;
+    }
+
+    println!("{:?}", min_n);
+}
+
+fn problem45() {
+    let max = 500000_i64;
+    let triangle = (1..max).map(|n| (n * (n + 1)) /2 ).collect::<Vec<i64>>();
+    let pentagon = (1..max).map(|n| (n * (3 * n - 1)) /2 ).collect::<HashSet<i64>>();
+    let hexagonal = (1..max).map(|n| n * (2 * n - 1)).collect::<HashSet<i64>>();
+
+    for t in triangle {
+        if pentagon.contains(&t) && hexagonal.contains(&t) {
+            println!("{}", t);
+        }
+    }
+}
+
+fn is_twice_square(n: i64) -> bool {
+    let square: f64 = (n as f64 / 2.0).sqrt();
+    (square as i64) as f64 == square
+}
+
+fn problem46() {
+    let mut i = 1;
+    let mut primes = Vec::new();
+    while (primes.len() <= 10000) {
+        if is_prime(i) {
+            primes.push(i);
+        }
+        i += 1;
+    }
+
+    let mut result = 1;
+    let mut found = false;
+    while(!found) {
+        result += 2;
+
+        let mut j = 0;
+        found = true;
+        while ( result >= primes[j] ){
+            if is_twice_square((result - primes[j]) as i64) {
+                found = false;
+                break;
+            }
+            j += 1;
+        }
+    }
+
+    println!("{}", result);
+}
+
+fn problem47() {
+    let max = 1000001;
+    let mut hash = HashMap::new();
+    for i in 1..max {
+        let f = factoring(i as f64);
+        let v = f.iter().map(|(x, r)| {
+            let mut ans = 1;
+            for _ in 1..(*r+1) {
+                ans *= x;
+            }
+            ans
+        }).collect::<Vec<i64>>();
+        hash.insert(i, v);
+    }
+
+    for i in 4..max {
+        let a = hash.get(&(i - 3)).unwrap();
+        let b = hash.get(&(i - 2)).unwrap();
+        let c = hash.get(&(i - 1)).unwrap();
+        let d = hash.get(&(i)).unwrap();
+
+        let mut v = a.iter()
+            .cloned()
+            .chain(
+                b.iter().cloned()
+            ).
+            chain(
+                c.iter().cloned()
+            ).
+            chain(
+                d.iter().cloned()
+            )
+            .into_iter()
+            .map(|n| n)
+            .collect::<Vec<i64>>();
+
+        v.sort();
+        v.dedup();
+        if v.len() == 16 {
+            println!("found:{}", i - 3);
+            break;
+        }
+    }
+
+}
+
+
+//素因数分解
+fn factoring(n: f64) -> Vec<(i64, i32)> {
+    if n == 1.0 {
+        return vec![(1, 1)];
+    }
+
+    let s = n.sqrt() as usize;
+    let mut y = n as i64;
+    let mut r = 0;
+
+    let mut result = Vec::new();
+
+    for x in 2..s + 1 {
+        if y % (x as i64) == 0 {
+            r = 0;
+            while y % (x as i64) == 0 {
+                r += 1;
+                y = y / x as i64;
+            }
+            result.push((x as i64, r));
+        }
+    }
+
+    if y as usize > s  {
+        result.push((y as i64, 1));
+    }
+
+    result
+}
+
 #[allow(dead_code)]
 fn main() {
     let start = Instant::now();
@@ -485,7 +662,18 @@ fn main() {
     // println!("{}", 's' as i32 - 64);
     // println!("{}", 'k' as i32 - 64);
     // println!("{}", 'y' as i32 - 64);
-    problem42();
+    //problem42();
+    //problem43();
+    //problem44();
+    //problem45();
+    //problem46();
+
+    // println!("14:{:?}", factoring(14.0));
+    // println!("15:{:?}", factoring(15.0));
+    // println!("644:{:?}", factoring(644.0));
+    // println!("645:{:?}", factoring(645.0));
+    // println!("646:{:?}", factoring(646.0));
+    problem47();
 
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
