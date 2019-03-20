@@ -1,3 +1,8 @@
+extern crate num_bigint;
+use num_bigint:: BigInt;
+extern crate num_traits;
+use num_traits::pow::Pow;
+
 use std::time::Instant;
 use std::collections::HashSet;
 use std::collections::HashMap;
@@ -461,13 +466,13 @@ fn problem43() {
     let mut sum = 0;
     for i in 1000000000..10000000000_i64 {
         let s = i.to_string();
-        if &s[1..4].parse::<i32>().unwrap() % 2 == 0
-            && &s[2..5].parse::<i32>().unwrap() % 3 == 0
-            && &s[3..6].parse::<i32>().unwrap() % 5 == 0
-            && &s[4..7].parse::<i32>().unwrap() % 7 == 0
-            && &s[5..8].parse::<i32>().unwrap() % 11 == 0
+        if &s[7..10].parse::<i32>().unwrap() % 17 == 0
             && &s[6..9].parse::<i32>().unwrap() % 13 == 0
-            && &s[7..10].parse::<i32>().unwrap() % 17 == 0 {
+            && &s[5..8].parse::<i32>().unwrap() % 11 == 0
+            && &s[4..7].parse::<i32>().unwrap() % 7 == 0
+            && &s[3..6].parse::<i32>().unwrap() % 5 == 0
+            && &s[2..5].parse::<i32>().unwrap() % 3 == 0
+            && &s[1..4].parse::<i32>().unwrap() % 2 == 0 {
 
             //println!("target: {:?}", i);
             let mut keta = s.chars().map(|c| c.to_digit(10).unwrap()).collect::<Vec<u32>>();
@@ -632,6 +637,130 @@ fn factoring(n: f64) -> Vec<(i64, i32)> {
     result
 }
 
+fn problem48() {
+    let mut ans = BigInt::from(0);
+    for i in 1..1001 {
+        let b = BigInt::from(i);
+        //println!("{}", b.pow(i as u32));
+        ans += b.pow(i as u32);
+    }
+
+    println!("{}", ans);
+}
+
+fn problem49() {
+    let primes = (1000..10000)
+        .filter_map(|n| if is_prime(n) { Some(n) } else { None })
+        .collect::<Vec<i32>>();
+
+    let hash_primes = primes.iter().map(|n| *n).collect::<HashSet<i32>>();
+
+    for p in primes.iter() {
+        for q in primes.iter() {
+            if q - p > 0 {
+                let diff = q - p;
+                let r = q + diff;
+                if hash_primes.contains(&r) {
+                    let mut p_v = p.to_string().chars().map(|c| c.to_digit(10).unwrap() as i32).collect::<Vec<i32>>();
+                    let mut q_v = q.to_string().chars().map(|c| c.to_digit(10).unwrap() as i32).collect::<Vec<i32>>();
+                    let mut r_v = r.to_string().chars().map(|c| c.to_digit(10).unwrap() as i32).collect::<Vec<i32>>();
+                    p_v.sort();
+                    q_v.sort();
+                    r_v.sort();
+
+                    let mut flg = true;
+                    for (i, n) in p_v.iter().enumerate() {
+                        if *n != q_v[i] || *n != r_v[i] {
+                            flg = false;
+                            break;
+                        }
+                    }
+
+                    if (flg) {
+                        println!("{}{}{}", p, q, r);
+                    }
+                }
+            }
+        }
+    }
+
+    //println!("{:?}", primes);
+}
+
+fn problem50() {
+    let primes = (1..1000000)
+        .filter_map(|n| 
+            if is_prime(n) { 
+                Some(n) 
+            } else { 
+                None 
+            }
+        )
+        .collect::<Vec<i32>>();
+
+    let hash_primes = primes.iter().map(|n| *n).collect::<HashSet<i32>>();
+
+    let max_prime = primes.iter().map(|n| *n).max().unwrap();
+
+    let mut max_count = 0;
+    let mut target = 0;
+    for n in primes.iter() {
+        let mut cnt = 2;
+        let mut sum = *n;
+        for n2 in primes.iter().filter(|num| num > &n) {
+            sum += n2;
+            if hash_primes.contains(&sum) {
+                if max_count < cnt {
+                    target = sum;
+                    max_count = cnt;
+                    // println!("{} {}", target, max_count);
+                }
+            }
+            cnt += 1;
+            if max_prime <= sum { break; }
+        }
+    }
+
+    println!("{} {}", target, max_count);
+}
+
+fn replace(n: i32, rep: &str, to_rep: &str) -> i32 {
+    let rep_str = n.to_string().replace(rep, to_rep);
+    rep_str.parse::<i32>().unwrap()
+}
+
+fn problem51() {
+    let mut n = 60000;
+    loop {
+        if is_prime(n) {
+            let v = n.to_string()
+                .chars()
+                .map(|c| c.to_digit(10).unwrap())
+                .collect::<Vec<u32>>();
+
+            //8個置換するはずだから最少値は0 or 1 or 2
+            for i in 0..3 {
+                //0 or 1 or 2が2つ以上あったら
+                let a0 = v.iter().filter(|n| **n == i).count();
+                if a0 >= 2 {
+                    let mut cnt = 0;
+                    for h in 0..10 {
+                        let cnv = replace(n, &i.to_string(), &h.to_string());
+                        if cnv.to_string().len() == n.to_string().len() && is_prime(cnv) {
+                            cnt += 1;
+                            if cnt == 8 {
+                                println!("found:{} {}", n, i);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        n += 1;
+    }
+}
+
 #[allow(dead_code)]
 fn main() {
     let start = Instant::now();
@@ -673,7 +802,22 @@ fn main() {
     // println!("644:{:?}", factoring(644.0));
     // println!("645:{:?}", factoring(645.0));
     // println!("646:{:?}", factoring(646.0));
-    problem47();
+    //problem47();
+    //problem48();
+    //problem49();
+    //problem50();
+    problem51();
+
+    println!("{:?}", is_prime(121313));
+    println!("{:?}", is_prime(222323));
+    println!("{:?}", is_prime(323333));
+    println!("{:?}", is_prime(424343));
+    println!("{:?}", is_prime(525353));
+    println!("{:?}", is_prime(626363));
+    println!("{:?}", is_prime(727373));
+    println!("{:?}", is_prime(828383));
+    println!("{:?}", is_prime(929393));
+    //println!("{:?}", is_prime(69191));
 
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms", (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
