@@ -761,6 +761,37 @@ fn problem51() {
     }
 }
 
+fn problem52() {
+    for x in 10..100000000 {
+        if problem52_sub(x, 2)
+            && problem52_sub(x, 3)
+            && problem52_sub(x, 4)
+            && problem52_sub(x, 5)
+            && problem52_sub(x, 6) {
+
+            println!("{}", x);
+            break;
+        }
+    }
+}
+
+fn problem52_sub(x: i64, mul: i64) -> bool {
+    let x2 = x * mul;
+    let mut s_x = x.to_string().chars().map(|c| c.to_digit(10).unwrap()).collect::<Vec<u32>>();
+    let mut s_x2 = x2.to_string().chars().map(|c| c.to_digit(10).unwrap()).collect::<Vec<u32>>();
+
+    s_x.sort();
+    s_x2.sort();
+
+    for (i, n) in s_x.iter().enumerate() {
+        if *n != s_x2[i] {
+            return false;
+        }
+    }
+
+    true
+}
+
 #[allow(dead_code)]
 fn main() {
     let start = Instant::now();
@@ -806,17 +837,18 @@ fn main() {
     //problem48();
     //problem49();
     //problem50();
-    problem51();
+    //problem51();
+    problem52();
 
-    println!("{:?}", is_prime(121313));
-    println!("{:?}", is_prime(222323));
-    println!("{:?}", is_prime(323333));
-    println!("{:?}", is_prime(424343));
-    println!("{:?}", is_prime(525353));
-    println!("{:?}", is_prime(626363));
-    println!("{:?}", is_prime(727373));
-    println!("{:?}", is_prime(828383));
-    println!("{:?}", is_prime(929393));
+    // println!("{:?}", is_prime(121313));
+    // println!("{:?}", is_prime(222323));
+    // println!("{:?}", is_prime(323333));
+    // println!("{:?}", is_prime(424343));
+    // println!("{:?}", is_prime(525353));
+    // println!("{:?}", is_prime(626363));
+    // println!("{:?}", is_prime(727373));
+    // println!("{:?}", is_prime(828383));
+    // println!("{:?}", is_prime(929393));
     //println!("{:?}", is_prime(69191));
 
     let elapsed = start.elapsed();
