@@ -461,27 +461,57 @@ fn problem42() {
     println!("{}", cnt);
 }
 
+// //これ長時間かかる 注意
+// fn problem43() {
+//     let mut sum = 0;
+//     for i in 1000000000..10000000000_i64 {
+//         let s = i.to_string();
+//         if &s[7..10].parse::<i32>().unwrap() % 17 == 0
+//             && &s[6..9].parse::<i32>().unwrap() % 13 == 0
+//             && &s[5..8].parse::<i32>().unwrap() % 11 == 0
+//             && &s[4..7].parse::<i32>().unwrap() % 7 == 0
+//             && &s[3..6].parse::<i32>().unwrap() % 5 == 0
+//             && &s[2..5].parse::<i32>().unwrap() % 3 == 0
+//             && &s[1..4].parse::<i32>().unwrap() % 2 == 0 {
+
+//             //println!("target: {:?}", i);
+//             let mut keta = s.chars().map(|c| c.to_digit(10).unwrap()).collect::<Vec<u32>>();
+//             keta.sort();
+//             keta.dedup();
+
+//             if keta.len() == 10 {
+//                 sum += i;
+//                 println!("found: {:?}", i);
+//             }
+//         }
+//     }
+//     println!("answer:{:?}", sum);
+// }
+
 //これ長時間かかる 注意
 fn problem43() {
     let mut sum = 0;
     for i in 1000000000..10000000000_i64 {
         let s = i.to_string();
-        if &s[7..10].parse::<i32>().unwrap() % 17 == 0
-            && &s[6..9].parse::<i32>().unwrap() % 13 == 0
-            && &s[5..8].parse::<i32>().unwrap() % 11 == 0
-            && &s[4..7].parse::<i32>().unwrap() % 7 == 0
-            && &s[3..6].parse::<i32>().unwrap() % 5 == 0
-            && &s[2..5].parse::<i32>().unwrap() % 3 == 0
-            && &s[1..4].parse::<i32>().unwrap() % 2 == 0 {
 
-            //println!("target: {:?}", i);
-            let mut keta = s.chars().map(|c| c.to_digit(10).unwrap()).collect::<Vec<u32>>();
-            keta.sort();
-            keta.dedup();
+        if &s[3..4].parse::<i32>().unwrap() & 1 == 0   //2で割り切れるかどうか
+           && (&s[5..6].parse::<i32>().unwrap() == &0 || &s[5..6].parse::<i32>().unwrap() == &5) { //5で割り切れるかどうか
 
-            if keta.len() == 10 {
-                sum += i;
-                println!("found: {:?}", i);
+            if &s[5..8].parse::<i32>().unwrap() % 11 == 0   //以下よりやり方不明
+                && &s[4..7].parse::<i32>().unwrap() % 7 == 0
+                && &s[2..5].parse::<i32>().unwrap() % 3 == 0
+                && &s[7..10].parse::<i32>().unwrap() % 17 == 0
+                && &s[6..9].parse::<i32>().unwrap() % 13 == 0 {
+
+                //println!("target: {:?}", i);
+                let mut keta = s.chars().map(|c| c.to_digit(10).unwrap()).collect::<Vec<u32>>();
+                keta.sort();
+                keta.dedup();
+
+                if keta.len() == 10 {
+                    sum += i;
+                    println!("found: {:?}", i);
+                }
             }
         }
     }
@@ -792,6 +822,275 @@ fn problem52_sub(x: i64, mul: i64) -> bool {
     true
 }
 
+fn problem53() {
+    let mut cnt = 0;
+    let limit = BigInt::from(1000000);
+    for i in 1..101 {
+        let n = factorial(i);
+
+        for h in 1..101 {
+            if i < h { break; }
+            let cp_n = n.clone();
+            let r = factorial(h);
+            let z = factorial(i - h);
+
+            let ans = cp_n / (r * z);
+            if ans > limit {
+                if cnt == 0 {
+                    println!("found over 1000000 {} {}", i, h);
+                }
+                cnt += 1;
+            }
+        }
+    }
+
+    println!("found {}", cnt);
+}
+
+fn factorial(n: i32) -> BigInt {
+    if n == 0 { return BigInt::from(1); }
+    (1..n + 1).fold(BigInt::from(1), |n1, n2| n1 * n2)
+}
+
+fn problem54() {
+    let mut cnt = 0;
+    let text_contents = std::fs::read_to_string("./p054_poker.txt").unwrap();
+    let all_lines = text_contents.split("\n");
+    for line in all_lines {
+        let mut player1 = CardSet::new();
+        let mut player2 = CardSet::new();
+        let cards = line.split(" ");
+        for (i, c) in cards.enumerate() {
+            if c.trim() != "" {
+                let card = Card::new(c.to_string());
+                if (i < 5) {
+                    player1.append(card);
+                } else {
+                    player2.append(card);
+                }
+            }
+        }
+
+        if player1.cards.len() == 0 || player2.cards.len() == 0 {
+            continue;
+        }
+
+        player1.what_hand();
+        player2.what_hand();
+
+        println!("{} vs {}", player1.hand, player2.hand);
+
+        if player1.hand < player2.hand {
+            cnt += 1;
+        } else if player1.hand == player2.hand {
+            if player1.biggest_num > player2.biggest_num {
+                cnt += 1;
+            } else if player1.biggest_num == player2.biggest_num {
+                if player1.second_biggest_num > player2.second_biggest_num {
+                    cnt += 1;
+                }
+            }
+        }
+    }
+
+    println!("player1 win : {}", cnt);
+}
+
+#[derive(Debug, Clone)]
+struct CardSet {
+    pub cards: Vec<Card>,
+    is_all_same_suit: bool,
+    pub hand: i32,
+    pub biggest_num: i32,
+    pub second_biggest_num: i32,
+}
+
+impl CardSet {
+    pub fn new() -> Self {
+        CardSet { 
+            cards: Vec::new(),
+            is_all_same_suit: false,
+            hand: 100,
+            biggest_num: 0,
+            second_biggest_num: 0,
+        }
+    }
+
+    pub fn append(&mut self, card: Card) {
+        self.cards.push(card);
+    }
+
+    pub fn what_hand(&mut self) {
+        let mut suits = self.cards.iter().map(|c| c.mark.clone()).collect::<Vec<String>>();
+        let mut numbers = self.cards.iter().map(|c| c.number).collect::<Vec<i32>>();
+        numbers.sort();
+
+        suits.sort();
+        suits.dedup();
+        if suits.len() == 1 {
+            self.is_all_same_suit = true;
+        }
+
+        let number1 = numbers[0];
+        if number1 + 1 == numbers[1] && number1 + 2 == numbers[2] && number1 + 3 == numbers[3] && number1 + 4 == numbers[4] {
+            if number1 == 10 && self.is_all_same_suit {
+                //ロイヤルフラッシュ
+                self.hand = 1;
+                self.biggest_num = number1 + 4;
+            } else if self.is_all_same_suit {
+                //ストレートフラッシュ
+                self.hand = 2;
+                self.biggest_num = number1 + 4;
+            } else {
+                //ストレート
+                self.hand = 6;
+                self.biggest_num = number1 + 4;
+            }
+        } else {
+            let mut cp_numbers = numbers.clone();
+            cp_numbers.dedup();
+            for n in cp_numbers {
+                if numbers.iter().filter(|num| num == &&n).count() == 4 {
+                    //フォーカード
+                    self.hand = 3;
+                    self.biggest_num = n;
+                } else if numbers.iter().filter(|num| num == &&n).count() == 3 {
+                    if self.hand == 9 {
+                        //フルハウス
+                        self.hand = 4;
+                        let n2 = self.biggest_num;
+                        self.biggest_num = n;
+                        self.second_biggest_num = n2;
+                    } else {
+                        //threeカード
+                        self.hand = 7;
+                        self.biggest_num = n;
+                    }
+                } else if numbers.iter().filter(|num| num == &&n).count() == 2 {
+                    if self.hand == 7 {
+                        self.hand = 4;
+                        self.second_biggest_num = n;
+                    } else if self.hand == 9 {
+                        //twoペア
+                        self.hand = 8;
+                        if self.biggest_num < n {
+                            let n2 = self.biggest_num;
+                            self.biggest_num = n;
+                            self.second_biggest_num = n2;
+                        } else {
+                            self.second_biggest_num = n;
+                        }
+                    } else {
+                        //ワンペア
+                        self.hand = 9;
+                        self.biggest_num = n;
+                    }
+                } else {
+                    if self.hand >= 10 {
+                        self.hand = 10;
+                        if self.biggest_num < n {
+                            let n2 = self.biggest_num;
+                            self.biggest_num = n;
+                            self.second_biggest_num = n2;
+                        } else {
+                            if self.second_biggest_num < n {
+                                self.second_biggest_num = n;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        if self.hand > 5 && self.is_all_same_suit {
+            self.hand = 5;
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Card {
+    original: String,
+    mark: String,
+    number: i32,
+}
+
+impl Card {
+    pub fn new(original: String) -> Self {
+        let s_num = original[0..1].to_string();
+        let s_mark = original[1..2].to_string();
+        
+        let num = if &s_num == "2" || &s_num == "3" || &s_num == "4"
+            || &s_num == "5" || &s_num == "6" || &s_num == "7"
+            || &s_num == "8" || &s_num == "9" {
+                s_num.parse::<i32>().unwrap()
+            } else if &s_num == "T" {
+                10
+            } else if &s_num == "J" {
+                11
+            } else if &s_num == "Q" {
+                12
+            } else if &s_num == "K" {
+                13
+            } else if &s_num == "A" {
+                14
+            } else {
+                panic!("wrong number");
+            };
+
+        Card {
+            original,
+            mark: s_mark,
+            number: num,
+        }
+    }
+}
+
+fn problem55() {
+    let mut count = 0;
+    for n in (1..10000) {
+        let mut calc = n;
+        for _i in 1..50 {
+            let mut str_vec = calc.to_string().chars().map(|c| c.to_string()).collect::<Vec<String>>();
+            str_vec.reverse();
+
+            let str_reverse = str_vec.join("");
+            let reverse = str_reverse.parse::<i128>().unwrap();
+
+            calc = calc + reverse;
+            if (is_palindrome(&calc.to_string())) {
+                count += 1;
+                break;
+            }
+        }
+    }
+
+    println!("palindrome {}", count);
+    println!("Lychrel {}", 9999 - count);
+}
+
+fn problem56() {
+    let mut max = 0;
+    for i in 1..101 {
+        let mut n = BigInt::from(i);
+        for h in 1..101 {
+            let p = n.pow(h as u32);
+
+            let calc = p.to_string().chars()
+                .map(|c| c.to_digit(10).unwrap())
+                .sum();
+
+            if calc > max {
+                max = calc;
+            }
+        }
+    }
+
+    println!("max is {}", max);
+
+}
+
 #[allow(dead_code)]
 fn main() {
     let start = Instant::now();
@@ -838,7 +1137,18 @@ fn main() {
     //problem49();
     //problem50();
     //problem51();
-    problem52();
+    //problem52();
+    // println!("{}", factorial(0));
+    // println!("{}", factorial(1));
+    // println!("{}", factorial(2));
+    // println!("{}", factorial(3));
+    // println!("{}", factorial(4));
+    // println!("{}", factorial(5));
+    //problem53();
+    //problem54();
+    //problem55();
+    
+    problem56();
 
     // println!("{:?}", is_prime(121313));
     // println!("{:?}", is_prime(222323));
