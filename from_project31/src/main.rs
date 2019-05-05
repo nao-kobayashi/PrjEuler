@@ -1091,6 +1091,58 @@ fn problem56() {
 
 }
 
+fn problem57() {
+    let mut den = BigInt::from(2);
+    let mut num = BigInt::from(3);
+    let mut result = 0;
+
+    for i in 1..1000 {
+        let num2: BigInt = 2 * den.clone() + num.clone();
+        let den2: BigInt = num2.clone() - den.clone();
+
+        if num2.to_string().len()  > den2.to_string().len() {
+            result += 1;
+        }
+
+        num = num2;
+        den = den2;
+    }
+
+    println!("{}", result);
+}
+
+fn problem58() {
+    let mut n = 1;
+    let mut len = 3;
+    let mut count = 1;
+    let mut primes_count = 0;
+
+    loop {
+        let mut n1 = n + len - 1;
+        let mut n2 = n1 + len - 1;
+        let mut n3 = n2 + len - 1;
+
+        count += 4;
+        if is_prime(n1) { primes_count += 1; }
+        if is_prime(n2) { primes_count += 1; }
+        if is_prime(n3) { primes_count += 1; }
+
+        if (primes_count as f64 / count as f64) < 0.1 {
+            println!("{}", len);
+            break;
+        }
+
+
+        n = n3 + len - 1;
+        len += 2; 
+
+        //println!("{} {} {} {} {}", n1, n2, n3, n, len);
+        //if n > 81 {
+         //   break;
+        //}
+    }
+}
+
 #[allow(dead_code)]
 fn main() {
     let start = Instant::now();
@@ -1148,8 +1200,9 @@ fn main() {
     //problem54();
     //problem55();
     
-    problem56();
-
+    // problem56();
+// problem57();
+problem58();
     // println!("{:?}", is_prime(121313));
     // println!("{:?}", is_prime(222323));
     // println!("{:?}", is_prime(323333));
