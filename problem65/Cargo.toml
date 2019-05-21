@@ -1,0 +1,8 @@
+[package]
+name = "problem65"
+version = "0.1.0"
+authors = ["kobayashi@kouei.co.jp <kobayashi@kouei.co.jp>"]
+edition = "2018"
+
+[dependencies]
+num-bigint = "0.2.2"
