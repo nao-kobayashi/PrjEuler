@@ -60,34 +60,34 @@ fn part(n: i32, m: i32, ways: &mut Vec<u64>) -> u64 {
 
 // 1   2   3   4   5   6    7    8    9   10
 // 1   1   2   4   6   10   14   21   29  41
-/*fn main() {
-    let mut coins = (1..101).map(|n| n).collect::<Vec<i32>>();
-    coins.sort_by_key(|n| -1 * n);
-    ///println!("{:?}", coins);
+// fn main() {
+//     let mut coins = (1..101).map(|n| n).collect::<Vec<i32>>();
+//     coins.sort_by_key(|n| -1 * n);
+//     ///println!("{:?}", coins);
 
 
-    for i in 1..11 {
-        let mut count = 0;
-        problem31(&coins, 0, 0, i, &mut count);
-        println!("{} = count:{}", i, count - 1);
-    }
+//     for i in 1..101 {
+//         let mut count = 0;
+//         problem31(&coins, 0, 0, i, &mut count);
+//         println!("{} = count:{}", i, count - 1);
+//     }
 
-}
+// }
 
-fn problem31(coins: &[i32], index: usize, sum: i32, target: i32, count: &mut i32) {
-    let n = coins[index];
-    let prv_val = sum;
+// fn problem31(coins: &[i32], index: usize, sum: i32, target: i32, count: &mut i32) {
+//     let n = coins[index];
+//     let prv_val = sum;
 
-    for i in 0..(target / n + 1) {
-        let val = (i * n) + prv_val;
+//     for i in 0..(target / n + 1) {
+//         let val = (i * n) + prv_val;
 
-        if val == target {
-            *count += 1;
-        } else {
-            if index + 1 < coins.len() {
-                problem31(coins, index + 1, val, target, count);
-            }
-        }
-    }
-}
-*/
+//         if val > target { break; }
+//         if val == target {
+//             *count += 1;
+//         } else {
+//             if index + 1 < coins.len() {
+//                 problem31(coins, index + 1, val, target, count);
+//             }
+//         }
+//     }
+// }
