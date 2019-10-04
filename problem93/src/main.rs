@@ -31,12 +31,12 @@ impl<'a, T> Pattern<'a, T> {
         T: PartialOrd,
     {
         let mut work = Vec::new();
-        self.create_formular_pattern(self.elements, &mut work);
+        self.create_formula_pattern(self.elements, &mut work);
         self.patterns.sort_by(|a, b| a.partial_cmp(b).unwrap());
         self.patterns.dedup();
     }
 
-    fn create_formular_pattern(&mut self, elements: &[T], result: &mut Vec<T>)
+    fn create_formula_pattern(&mut self, elements: &[T], result: &mut Vec<T>)
     where
         T: Clone,
     {
@@ -50,7 +50,7 @@ impl<'a, T> Pattern<'a, T> {
                 self.set_next(i, elements, &mut next_elements);
 
                 result.push(elements[i].clone());
-                self.create_formular_pattern(&next_elements, result);
+                self.create_formula_pattern(&next_elements, result);
                 let _ = result.pop();
             }
         }
@@ -138,11 +138,11 @@ fn main() {
     let start = Instant::now();
 
     //1が数字、0が演算子
-    let formular = vec![1, 1, 1, 1, 0, 0, 0];
-    let mut form_pat = Pattern::new(&formular);
+    let formula = vec![1, 1, 1, 1, 0, 0, 0];
+    let mut form_pat = Pattern::new(&formula);
     form_pat.create();
     //最低限、最初の２つは数字の必要がある。
-    let target_formular = form_pat.patterns.iter()
+    let target_formula = form_pat.patterns.iter()
         .filter(|arr| arr[0] == 1 && arr[1] == 1)
         .map(|arr| arr)
         .collect::<Vec<&Vec<i32>>>();
@@ -160,7 +160,7 @@ fn main() {
         let mut answer = Vec::new();
         for num_source in &numb_pat.patterns {
             for ope_source in &operators {
-                for f_source in &target_formular {
+                for f_source in &target_formula {
                     let mut ope_index = 0;
                     let mut num_index = 0;
 
