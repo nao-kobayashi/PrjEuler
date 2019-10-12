@@ -1,6 +1,8 @@
+use std::time::Instant;
 use std::collections::HashMap;
 
 fn main() {
+    let start = Instant::now();
     let mut square_numbers: HashMap<usize, Vec<i32>> = HashMap::new();
 
     let data = read_file();
@@ -16,6 +18,12 @@ fn main() {
             square_numbers.insert(len, nums);
         }
     }
+    
+    let elapsed = start.elapsed();
+    println!(
+        "{} ms",
+        (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64
+    );
 }
 
 fn solve(w1: &str, w2: &str, square_nums: &[i32]) {
@@ -24,19 +32,16 @@ fn solve(w1: &str, w2: &str, square_nums: &[i32]) {
     let w1_arr = w1.chars().map(|c| c).collect::<Vec<char>>();
     let w2_arr = w2.chars().map(|c| c).collect::<Vec<char>>();
 
-    for x in square_nums.iter() {        
+    for i in 0..square_nums.len() {
+        let x = square_nums[i];
         let x_str = x.to_string().chars().map(|c| c).collect::<Vec<char>>();
         let mut check_x = x_str.clone();
         check_x.sort();
 
-        for y in square_nums.iter() {            
+        for h in i + 1..square_nums.len() {
+            let y = square_nums[h];
             if x == y { continue;}
             let y_str = y.to_string().chars().map(|c| c).collect::<Vec<char>>();
-
-            //数字自体がアナグラムのはず
-            let mut check_y = y_str.clone();
-            check_y.sort();
-            if check_x != check_y { continue; }
 
             let mut is_found = true;
             hash.clear(); 
@@ -72,6 +77,11 @@ fn solve(w1: &str, w2: &str, square_nums: &[i32]) {
             }
 
             if is_found {
+                //数字自体がアナグラムのはず
+                let mut check_y = y_str.clone();
+                check_y.sort();
+                if check_x != check_y { continue; }
+
                 // println!("{:?}", hash);
                 println!("found {} {} {} {}", &w1, &w2, x, y);
                 return;
@@ -87,19 +97,19 @@ fn create_square_number(len: i32) -> Vec<i32> {
         start += "0";
     }
 
-   let mut start_num = start.parse::<i32>().unwrap();
-   let end_enum = (start + "0").parse::<i32>().unwrap();
-   while start_num < end_enum {
-       let f = start_num as f64;
-       let sqrt = f.sqrt();
-       if (sqrt as i32 * sqrt as i32) as f64 == f {
-           nums.push(start_num);
-       }
+    let mut start_num = start.parse::<i32>().unwrap();
+    let end_enum = (start + "0").parse::<i32>().unwrap();
+    while start_num < end_enum {
+        let f = start_num as f64;
+        let sqrt = f.sqrt();
+        if (sqrt as i32 * sqrt as i32) as f64 == f {
+            nums.push(start_num);
+        }
 
-       start_num += 1;
-   }
+        start_num += 1;
+    }
 
-   nums
+    nums
 }
 
 fn get_anagrams(data: Vec<String>) -> Vec<(String, String)> {
@@ -108,7 +118,6 @@ fn get_anagrams(data: Vec<String>) -> Vec<(String, String)> {
         let s1 = data[i].to_string();
         for j in i + 1..data.len() {
             let s2 = data[j].to_string();
-            // println!("{} {}", &s1, &s2);
             if s1.len() != s2.len() || s1 == s2.chars().rev().collect::<String>() {
                 continue;
             }
@@ -117,23 +126,10 @@ fn get_anagrams(data: Vec<String>) -> Vec<(String, String)> {
             let mut arr2 = s2.chars().map(|c| c).collect::<Vec<char>>();
             arr1.sort();
             arr2.sort();
-            // println!("sort {:?} {:?}", &arr1, &arr2);
 
             if arr1 == arr2 {
                 anagrams.push((s1.to_string(), s2));
             }
-
-            // let mut is_anagram = true;
-            // for (c1, c2) in arr1.iter().zip(arr2.iter()) {
-            //     if c1 != c2 {
-            //         is_anagram = false;
-            //         break
-            //     }
-            // }
-
-            // if is_anagram {
-            //     anagrams.push((s1.to_string(), s2));
-            // }
         }
     }
     anagrams
