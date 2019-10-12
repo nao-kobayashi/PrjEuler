@@ -1,22 +1,39 @@
+use std::thread;
+use std::sync::{ Arc, Mutex };
 use std::time::Instant;
 use std::collections::HashMap;
 
 fn main() {
     let start = Instant::now();
-    let mut square_numbers: HashMap<usize, Vec<i32>> = HashMap::new();
+    let square_numbers = Arc::new(Mutex::new(HashMap::new()));
 
+    let mut handles = Vec::new();
     let data = read_file();
     let anagrams = get_anagrams(data);
 
     for (w1, w2) in &anagrams {
-        let len = w1.len();
-        if square_numbers.contains_key(&len) {
-            solve(w1, w2, &square_numbers.get(&len).unwrap());
-        } else {
-            let nums = create_square_number(len as i32);
-            solve(w1, w2, &nums);
-            square_numbers.insert(len, nums);
-        }
+        let w1 = w1.to_string();
+        let w2 = w2.to_string();
+        let square_numbers = square_numbers.clone();
+        handles.push(thread::spawn(move || {
+            let len = w1.len();
+            let nums = 
+                {
+                    let mut hash = square_numbers.lock().unwrap();
+                    if !hash.contains_key(&len) {
+                        let nums = create_square_number(len as i32);
+                        hash.insert(len, nums);
+                    }
+                    hash.get(&len).unwrap().clone()
+                };
+            
+
+            solve(&w1, &w2, &nums);
+        }));
+    }
+
+    for h in handles {
+        h.join().unwrap();
     }
     
     let elapsed = start.elapsed();
