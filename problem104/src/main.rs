@@ -5,7 +5,7 @@ fn main() {
     let start = Instant::now();
     let mut a = vec![1];
     let mut b = vec![1];
-    let mut c = vec![0];
+    let mut c = Vec::new();
     let mut count = 2;
 
     while count < 1000000 {
@@ -46,7 +46,7 @@ fn main() {
         std::mem::swap(&mut b, &mut c);
         count += 1;
 
-        if count % 1000 == 0 {
+        if count % 10000 == 0 {
             println!("{}", count);
         }
 
@@ -64,6 +64,7 @@ fn main() {
         "{} ms",
         (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64
     );
+    //ans is 329468
 }
 
 fn check(source: &[i32]) -> bool {
