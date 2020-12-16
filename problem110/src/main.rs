@@ -17,7 +17,20 @@ divisors
 */
 fn main() {
     let start_time = Instant::now();
-    let primes = vec![2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
+    //let primes = vec![2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
+    let mut primes = Vec::new();
+    primes.push(BigInt::from(2));
+    primes.push(BigInt::from(3));
+    primes.push(BigInt::from(5));
+    primes.push(BigInt::from(7));
+    primes.push(BigInt::from(11));
+    primes.push(BigInt::from(13));
+    primes.push(BigInt::from(17));
+    primes.push(BigInt::from(19));
+    primes.push(BigInt::from(23));
+    primes.push(BigInt::from(29));
+    primes.push(BigInt::from(31));
+    primes.push(BigInt::from(37));
     let limit = 4000000;
 
     let mut todo = BTreeMap::new();
@@ -30,7 +43,7 @@ fn main() {
         //println!("{}", &value);
         //println!("{:?}", &exponents);
 
-        let mut unique_factors: u128 = 1;
+        let mut unique_factors = 1;
         for x in &exponents {
             unique_factors *= 2 * *x + 1;
         }
@@ -43,12 +56,13 @@ fn main() {
         }
 
         for i in 0..exponents.len() {
+            //optimizing
             if exponents[i] == 1 && i > 3 {
                 break;
             }
 
             *exponents.get_mut(i).unwrap() += 1;
-            value *= BigInt::from(primes[i]);
+            value *= &primes[i];
             todo.insert(value.clone(), exponents.clone());
         }
     }
